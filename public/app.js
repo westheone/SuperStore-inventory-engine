@@ -143,9 +143,7 @@ const handleAddProduct = async (event) => {
     form.reset(); // Clear the form after submission
     resyncStorefront();
     resyncAdmin();
-    
 
-    
   } catch (error) {
     console.error("Failed to add product:", error);
   }
@@ -155,13 +153,13 @@ const handleDeleteProduct = async (event) => {
   event.preventDefault();
   const form = document.getElementById('delete-product-form');
   const deleteProductId = parseInt(form.elements['product-id'].value,10);
-  if (isNaN(productId)) {
-    console.error("Invalid Product ID")
+  if (isNaN(deleteProductId)) {
+    console.error("Invalid Product ID, Can't Find Product")
     return;
   }
 
   try{
-    const response = await fetch(`api/inventory/${deleteProductId}`, {
+    const response = await fetch(`/api/inventory/${deleteProductId}`, {
       method: 'DELETE',
     });
 
@@ -178,7 +176,42 @@ const handleDeleteProduct = async (event) => {
   }
 }
 
-const handleUpdateProduct = async (event) => {}
+const handleUpdateProduct = async (event) => {
+  event.preventDefault()
+  const form = document.getElementById('update-inventory-form')
+  const updatedProduct = {
+    id: parseInt(form.elements['product-id'].value,10),
+    name: form.elements['product-name'].value,
+    category: form.elements['product-category'].value,
+    price: parseFloat(form.elements['product-price'].value),
+    stockCount: parseInt(form.elements['product-stock'].value, 10)
+  }
+
+  if (isNaN(updatedProduct.id)) {
+    console.error("Invalid Product ID, Can't Find Product")
+    return;
+  }
+
+  try {
+    const reponse = await fetch(`/api/inventory/${updatedProduct.id}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(updatedProduct)
+    });
+    if (!reponse.ok) {
+      throw new Error(`Server responded with status: ${reponse.status}`);
+    }
+    console.log('Product Updated')
+    form.reset(); // Clear the form after submission
+    resyncStorefront();
+    resyncAdmin();
+
+  } catch (error) {
+    console.error("Failed to update product:", error);
+  }
+}
 
 
 // Function to initialize storefront current inventory data

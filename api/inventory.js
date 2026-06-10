@@ -26,6 +26,8 @@ router.route('/').get( (req, res) => {
   // POST - adds product data to invertory
 }).post((req, res) => {
   const newProduct = req.body
+
+  // adds products
   newProduct.id = inventory.length ? inventory[inventory.length - 1].id + 1 : 1; // Auto-increment ID
   inventory.push(newProduct)
   res.status(201).json({ success: true, inventory })
@@ -33,27 +35,34 @@ router.route('/').get( (req, res) => {
 })
 
 router.route('/:id').delete((req, res) => {
-  const productId = parseInt(req.params.id, 10); 
-  const productIndex = inventory.findIndex(item => item.id === productId)
-
-  // deletes
-  if (productIndex !== -1) {
-    inventory.splice(productIndex, 1)
-    res.status(204).json({ success: true, inventory })
-  } else {
-    res.status(404).json({ success: false, message: "Product not found" })
+  const deleteProductId = parseInt(req.params.id, 10);
+    
+    // Find the index of the product with the matching ID
+  const productIndex = inventory.findIndex(product => product.id === deleteProductId);
+    
+    // If the product doesn't exist, return a 404 status
+  if (productIndex === -1) {
+    return res.status(404).json({ success: false, message: "Product not found" });
   }
+    
+    // Remove the product from your in-memory array
+  inventory.splice(productIndex, 1);
+    
+    // Respond back with the updated inventory array
+  res.status(200).json({ success: true, inventory });
 }).patch((req,res) => {
-  const productId = req.params
+  const productId = parseInt(req.params.id, 10);
   const product= inventory.find(item => item.id === productId)
+
+  
   if (!product) {
     res.status(404).json({ success: false, message: "Product not found"})
   } 
   const { name, category, price, stockCount } = req.body;
 
   // updates fields with data in it only
-  if (name !== undefined) {product.name = name; }  
-  if (category !== undefined) {product.category = category; }
+  if (name !== undefined && name.trim() !== "") { product.name = name; } 
+  if (category !== undefined && category.trim() !== "") {product.category = category; }
   if (price !== undefined) { product.price = parseFloat(price); } 
   if (stockCount !== undefined) {product.stockCount = parseInt(stockCount, 10); } 
 
@@ -67,7 +76,7 @@ router.route('/:id').delete((req, res) => {
   })
 
 }).get((req,res) => {
-  const  productId  = req.params;
+  const  productId  = parseInt(req.params.id, 10);
   const foundProduct = inventory.find((item) => item.id === productId);
 
   res.send(foundProduct);
