@@ -21,7 +21,7 @@ const inventory = [
   // GET - to load the inventory data on the frontend
 router.route('/').get( (req, res) => { 
   // console.log('Inventory requested')
-  res.json(inventory) // sends the inventory JSON response
+  res.status(200).json({ success: true, inventory }) // sends the inventory JSON response
 
   // POST - adds product data to invertory
 }).post((req, res) => {

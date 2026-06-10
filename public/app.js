@@ -1,20 +1,4 @@
 
-async function syncInventory() {
-  try {
-    const response = await fetch('/api/inventory');
-    if (!response.ok) {
-      throw new Error(`Server responded with status: ${response.status}`);
-    }
-  const inventoryData = await response.json();
-  return inventoryData;
-  console.log('Synchronized:')
-
-  } catch (error) {
-    console.error('Failed to fetch inventory:', error);
-    return [];
-  }
-
-}
 // Function to update product stock count on the server
 async function updateProductStock(id, newStockCount) {
   try {
@@ -39,8 +23,8 @@ async function updateProductStock(id, newStockCount) {
     console.log('Updated Object:');
 
     // RE-SYNC THE UI: Clear existing products & Run layout function to refresh numbers
-    resyncStorefront();
-    resyncAdmin();
+    syncStorefront();
+   syncAdminCatalog();
 
   } catch (error) {
     console.error("Failed to execute inventory update:", error);
@@ -59,41 +43,48 @@ const handleAddToCart = (productId, inventory) => {
 
 // Function to render products on the page
 function renderProducts(inventory) {
-const productSection = document.getElementById('product-grid');
+    const productSection = document.getElementById('product-grid');
+  if (!productSection) {
+    console.error("Critical Error: Could not find the '#product-grid' element in the HTML DOM.");
+    return; 
+  }
 
-inventory.forEach(product => {
-  const productCard = document.createElement('article');
-  productCard.classList.add('product-card');
+  // const sectionHeader = document.createElement('h2');
+  // sectionHeader.textContent = "Product Catalog";
+  // sectionHeader.id = "grid-heading"
+  inventory.forEach(product => {
+    const productCard = document.createElement('article');
+    productCard.classList.add('product-card');
 
-  const categoryTag = document.createElement('span');
-  categoryTag.classList.add('category-tag');
-  categoryTag.textContent = product.category;
-  productCard.appendChild(categoryTag);
+    const categoryTag = document.createElement('span');
+    categoryTag.classList.add('category-tag');
+    categoryTag.textContent = product.category;
+    productCard.appendChild(categoryTag);
 
-  const productTitle = document.createElement('h3');
-  productTitle.classList.add('product-title');
-  productTitle.textContent = product.name;
-  productCard.appendChild(productTitle);
+    const productTitle = document.createElement('h3');
+    productTitle.classList.add('product-title');
+    productTitle.textContent = product.name;
+    productCard.appendChild(productTitle);
 
-  const priceText = document.createElement('p');
-  priceText.classList.add('price-text');
-  priceText.textContent = `$${product.price.toFixed(2)}`;
-  productCard.appendChild(priceText);
+    const priceText = document.createElement('p');
+    priceText.classList.add('price-text');
+    priceText.textContent = `$${product.price.toFixed(2)}`;
+    productCard.appendChild(priceText);
 
-  const stockText = document.createElement('p');
-  stockText.classList.add('instock-text');
-  stockText.textContent = `In Stock: ${product.stockCount}`;
-  productCard.appendChild(stockText);
+    const stockText = document.createElement('p');
+    stockText.classList.add('instock-text');
+    stockText.textContent = `In Stock: ${product.stockCount}`;
+    productCard.appendChild(stockText);
 
-  const addToCartBtn = document.createElement('button');
-  addToCartBtn.classList.add('button-look');
-  addToCartBtn.setAttribute('type', 'button');
-  addToCartBtn.textContent = 'Add to Cart';
-  addToCartBtn.addEventListener('click', () => handleAddToCart(product.id,inventory));
-  productCard.appendChild(addToCartBtn);
+    const addToCartBtn = document.createElement('button');
+    addToCartBtn.classList.add('button-look');
+    addToCartBtn.setAttribute('type', 'button');
+    addToCartBtn.textContent = 'Add to Cart';
+    addToCartBtn.addEventListener('click', () => handleAddToCart(product.id,inventory));
+    productCard.appendChild(addToCartBtn);
 
-  productSection.appendChild(productCard);
-});
+    productSection.appendChild(productCard);
+  });
 }
 // Function to render the admin inventory catalog 
 function renderAdminCatalog(inventory) {
@@ -141,8 +132,8 @@ const handleAddProduct = async (event) => {
     console.log('Added Product:');
     // RE-SYNC THE UI: Clear existing products & Run layout function to refresh numbers
     form.reset(); // Clear the form after submission
-    resyncStorefront();
-    resyncAdmin();
+    syncStorefront();
+    syncAdminCatalog();
 
   } catch (error) {
     console.error("Failed to add product:", error);
@@ -168,8 +159,8 @@ const handleDeleteProduct = async (event) => {
     }
     console.log('Product Deleted')
     form.reset();
-    resyncStorefront()
-    resyncAdmin()
+    syncStorefront()
+    syncAdminCatalog()
 
   } catch (error) {
     console.error("Failed to delete product:", error);
@@ -205,71 +196,76 @@ const handleUpdateProduct = async (event) => {
     }
     console.log('Product Updated')
     form.reset(); // Clear the form after submission
-    resyncStorefront();
-    resyncAdmin();
+    syncStorefront();
+    syncAdminCatalog();
 
   } catch (error) {
     console.error("Failed to update product:", error);
   }
 }
 
+// Fetches fresh data from the server and renders it
+async function initStorefront() {
+    try {
+        // Fetch the latest inventory array from your backend route
+        const response = await fetch('/api/inventory');
+        const data = await response.json();
+        
+        // Handle if server responds with an array directly or an object { inventory: [...] }
+        const currentInventory = Array.isArray(data) ? data : data.inventory;
 
-// Function to initialize storefront current inventory data
-function initializeStorefront() {
-  syncInventory().then(inventory => {
-    renderProducts(inventory);
-  }).catch(error => {
-    console.error('Error initializing storefront:', error);
-  });
+        // Pass that fresh data right into your render function
+        renderProducts(currentInventory);
+        
+    } catch (error) {
+        console.error("Error initializing storefront:", error);
+    }
 }
-// Function to re-sync storefront after updates
-function resyncStorefront() {
-  const productSection = document.getElementById('product-grid');
+
+// Clears the DOM grid and triggers a fresh fetch-and-render
+async function syncStorefront() {
+    const productSection = document.getElementById('product-grid');
+    if (!productSection) return;
+
+    // 1. Clear out the old HTML elements
     productSection.innerHTML = '';
-    initializeStorefront();
+
+    // 2. Wait for initializeStorefront to fetch fresh data and redraw them
+    await initStorefront();
 }
-// Function to initialize admin panel current inventory data
-function initializeAdmin() {
-  syncInventory().then(inventory => {
-    renderAdminCatalog(inventory);
-  }).catch(error => {
-    console.error('Error initializing admin panel:', error);
-  });
+
+// Fetches fresh data from the server and renders it
+async function initAdminCatalog() {
+    try {
+        // 1. Fetch the latest inventory array from your backend route
+        const response = await fetch('/api/inventory');
+        const data = await response.json();
+        
+        // Handle if your server responds with an array directly or an object { inventory: [...] }
+        const currentInventory = Array.isArray(data) ? data : data.inventory;
+
+        // 2. Pass that fresh data right into your render function
+        renderAdminCatalog(currentInventory);
+        
+    } catch (error) {
+        console.error("Error initializing admin catalog:", error);
+    }
 }
-// Function to re-sync admin panel after updates
-function resyncAdmin() {
-  const adminSection = document.getElementById('admin-inventory-table-body');
-    adminSection.innerHTML = '';
-    initializeAdmin();
+
+// Clears the DOM grid and triggers a fresh fetch-and-render
+async function syncAdminCatalog() {
+    const productSection = document.getElementById('product-grid');
+    if (!productSection) return;
+
+    // 1. Clear out the old HTML elements
+    productSection.innerHTML = '';
+
+    // 2. Wait for initializeStorefront to fetch fresh data and redraw them
+    await initAdminCatalog();
 }
 
 
 // Call the initialization function when the page loads
-window.addEventListener('DOMContentLoaded', initializeStorefront);
-window.addEventListener('DOMContentLoaded', initializeAdmin);
+window.addEventListener('DOMContentLoaded', initStorefront);
+window.addEventListener('DOMContentLoaded', initAdminCatalog);
 
-
-
-// const updateProductDisplay = () => {
-//   const inventory = JSON.parse(localStorage.getItem("inventory"));
-//   const productCards = document.querySelectorAll('.product-card');
-
-//   productCards.forEach((card, index) => {
-//     const product = inventory[index];
-//     const stockText = card.querySelector('.instock-text');
-//     stockText.textContent = `In Stock: ${product.stockCount}`;
-//   });
-// };
-
-// const handleAddToCart = (productId) => {
-//   // const inventory = JSON.parse(localStorage.getItem("inventory"));
-//   const inventory = syncInventory();
-//   const productIndex = inventory.findIndex(p => p.id === productId);
-//   if (productIndex !== -1 && inventory[productIndex].stockCount > 0) {
-//     inventory[productIndex].stockCount -= 1;
-//     inventory[productIndex].cartid = Date.now();
-
-//     //localStorage.setItem("inventory", JSON.stringify(inventory));
-//     updateProductDisplay();
-//   }
-// };
