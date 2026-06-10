@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SuperStore front Prototype</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="app.js" defer></script>
+  </head>
+
+  <body>
+    <header>
+      <div class="logo">SuperStore</div>
+      <nav aria-label="Main Navigation">
+        <ul>
+          <li><a href="./storefront.html">Shop</a></li>
+          <li><a href="./admin.html">Admin</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <h1>Admin Panel</h1>
+      <p>Manage your inventory and view sales data.</p>
+
+      <div class="admin-container">
+        <div class="admin-form-container">
+          <form
+            id="add-product-form"
+            class="inventory-form"
+            aria-label="Add New Product"
+          >
+            <h2>Add New Product</h2>
+            <label for="product-name">Product Name:</label>
+            <input
+              type="text"
+              id="product-name"
+              name="name"
+              placeholder="Enter product name"
+              required
+            />
+
+            <label for="product-category">Category:</label>
+            <input
+              type="text"
+              id="product-category"
+              name="category"
+              placeholder="Enter category"
+              required
+            />
+
+            <label for="product-price">Price:</label>
+            <input
+              type="number"
+              id="product-price"
+              name="price"
+              step="0.01"
+              placeholder="Enter price 1, 5.50, 10.99 ..."
+              required
+            />
+
+            <label for="product-stock">Stock Count:</label>
+            <input
+              type="number"
+              id="product-stock"
+              name="stockCount"
+              min="0"
+              placeholder="Enter stock count 0, 5, 10 ..."
+              required
+            />
+            <input
+              type="submit"
+              value="Add Product"
+              class="button-look"
+              onclick="handleAddProduct(event)"
+            />
+          </form>
+
+          <form
+            id="update-inventory-form"
+            class="inventory-form"
+            aria-label="Update Existing Product"
+          >
+            <h2>Update Product</h2>
+            <label for="update-product-id">Product ID:</label>
+            <input
+              type="text"
+              id="update-product-id"
+              name="id"
+              placeholder="Enter product ID to update"
+              required
+            />
+
+            <label for="update-product-price">New Price:</label>
+            <input
+              type="number"
+              id="update-product-price"
+              name="price"
+              step="0.01"
+              placeholder="Enter new price 1, 5.50, 10.99 ..."
+            />
+
+            <label for="update-product-stock">New Stock Count:</label>
+            <input
+              type="number"
+              id="update-product-stock"
+              name="stockCount"
+              min="0"
+              placeholder="Enter new stock count 0, 5, 10 ..."
+            />
+
+            <input
+              type="submit"
+              value="Update Product"
+              class="button-look"
+              onclick="handleUpdateProduct(event)"
+            />
+          </form>
+
+          <form
+            id="delete-product-form"
+            class="inventory-form"
+            aria-label="Delete Product"
+          >
+            <h2>Delete Product</h2>
+            <label for="product-id">Product ID:</label>
+            <input
+              type="text"
+              id="product-id"
+              name="id"
+              placeholder="Enter product ID to delete"
+              required
+            />
+            <input
+              type="submit"
+              value="Delete Product"
+              class="button-look"
+              onclick="handleDeleteProduct(event)"
+            />
+          </form>
+        </div>
+
+        <section
+          id="admin-inventory-catalog"
+          class="admin-inventory-catalog"
+          aria-label="Current Inventory Catalog"
+        >
+          <h2>Current Inventory</h2>
+          <table aria-label="Inventory Catalog">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Stock Count</th>
+              </tr>
+            </thead>
+            <tbody id="admin-inventory-table-body">
+              <!-- Inventory items will be dynamically inserted -->
+            </tbody>
+          </table>
+        </section>
+      </div>
+    </main>
+
+    <footer>
+      <p>2026 SuperStore Prototype v1.0.5</p>
+    </footer>
+  </body>
+</html>

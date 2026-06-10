@@ -1,0 +1,76 @@
+const express = require("express")
+const router = express.Router()
+
+module.exports = router
+
+// database simulation (in-memory)
+const inventory = [
+  { id: 1, name: "Premium Wireless Headphones", category: "Electronics", price: 129.99, stockCount: 15, cartid: undefined },
+  { id: 2, name: "Ergonomic Office Chair", category: "Furniture", price: 249.99, stockCount: 3, cartid: undefined },
+  { id: 3, name: "Stainless Steel Water Bottle", category: "Fitness", price: 24.99, stockCount: 0, cartid: undefined  },
+  { id: 4, name: "Smart LED Desk Lamp", category: "Electronics", price: 59.99, stockCount: 8, cartid: undefined  },
+  { id: 5, name: "Memory Foam Pillow", category: "Furniture", price: 39.99, stockCount: 12, cartid: undefined },
+  { id: 6, name: "Yoga Mat with Carrying Strap", category: "Fitness", price: 29.99, stockCount: 5, cartid: undefined },
+  { id: 7, name: "Bluetooth Speaker", category: "Electronics", price: 89.99, stockCount: 2, cartid: undefined },
+  { id: 8, name: "Adjustable Standing Desk Converter", category: "Furniture", price: 199.99, stockCount: 4, cartid: undefined },
+  { id: 9, name: "Resistance Bands Set", category: "Fitness", price: 19.99, stockCount: 20, cartid: undefined },
+  { id: 10, name: "4K Ultra HD Action Camera", category: "Electronics", price: 149.99, stockCount: 7, cartid: undefined },
+]
+
+  // route to GET and POST for invertory
+  // GET - to load the inventory data on the frontend
+router.route('/').get( (req, res) => { 
+  // console.log('Inventory requested')
+  res.json(inventory) // sends the inventory JSON response
+
+  // POST - adds product data to invertory
+}).post((req, res) => {
+  const newProduct = req.body
+  newProduct.id = inventory.length ? inventory[inventory.length - 1].id + 1 : 1; // Auto-increment ID
+  inventory.push(newProduct)
+  res.status(201).json({ success: true, inventory })
+
+})
+
+router.route('/:id').delete((req, res) => {
+  const productId = parseInt(req.params.id, 10); 
+  const productIndex = inventory.findIndex(item => item.id === productId)
+
+  // deletes
+  if (productIndex !== -1) {
+    inventory.splice(productIndex, 1)
+    res.status(204).json({ success: true, inventory })
+  } else {
+    res.status(404).json({ success: false, message: "Product not found" })
+  }
+}).patch((req,res) => {
+  const productId = req.params
+  const product= inventory.find(item => item.id === productId)
+  if (!product) {
+    res.status(404).json({ success: false, message: "Product not found"})
+  } 
+  const { name, category, price, stockCount } = req.body;
+
+  // updates fields with data in it only
+  if (name !== undefined) {product.name = name; }  
+  if (category !== undefined) {product.category = category; }
+  if (price !== undefined) { product.price = parseFloat(price); } 
+  if (stockCount !== undefined) {product.stockCount = parseInt(stockCount, 10); } 
+
+  console.log(`Product ID ${productId} successfully patched!`);
+
+  // Return status 200 and hand back the updated data set
+  res.status(200).json({ 
+    success: true, 
+    message: "Product updated successfully!", 
+    updatedProduct: product
+  })
+
+}).get((req,res) => {
+  const  productId  = req.params;
+  const foundProduct = inventory.find((item) => item.id === productId);
+
+  res.send(foundProduct);
+})
+
+
