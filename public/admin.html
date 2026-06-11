@@ -24,7 +24,7 @@
       <p>Manage your inventory and view sales data.</p>
 
       <div class="admin-container">
-        <div class="admin-form-container">
+        <section class="admin-form-container">
           <form
             id="add-product-form"
             class="inventory-form"
@@ -156,7 +156,26 @@
               onclick="handleDeleteProduct(event)"
             />
           </form>
-        </div>
+        </section>
+
+        <section
+          id="admin-lowout-stock"
+          aria-label="Low and Out of Stock Inventory"
+        >
+          <h2>Low and Out of Stock Products</h2>
+          <table aria-label="Low Stock Catalog">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Stock Count</th>
+              </tr>
+            </thead>
+            <tbody id="admin-lowout-table-body">
+              <!-- Low and Out Stock loads here-->
+            </tbody>
+          </table>
+        </section>
 
         <section
           id="admin-inventory-catalog"
@@ -175,7 +194,7 @@
               </tr>
             </thead>
             <tbody id="admin-inventory-table-body">
-              <!-- Inventory items will be dynamically inserted -->
+              <!-- Inventory items loads here-->
             </tbody>
           </table>
         </section>

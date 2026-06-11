@@ -31,7 +31,6 @@ router.route('/').get( (req, res) => {
   newProduct.id = inventory.length ? inventory[inventory.length - 1].id + 1 : 1; // Auto-increment ID
   inventory.push(newProduct)
   res.status(201).json({ success: true, inventory })
-
 })
 
 router.route('/:id').delete((req, res) => {
@@ -45,7 +44,7 @@ router.route('/:id').delete((req, res) => {
     return res.status(404).json({ success: false, message: "Product not found" });
   }
     
-    // Remove the product from your in-memory array
+    // Remove the product from in-memory array
   inventory.splice(productIndex, 1);
     
     // Respond back with the updated inventory array
@@ -53,8 +52,7 @@ router.route('/:id').delete((req, res) => {
 }).patch((req,res) => {
   const productId = parseInt(req.params.id, 10);
   const product= inventory.find(item => item.id === productId)
-
-  
+  // If the product doesn't exist, return a 404 status
   if (!product) {
     res.status(404).json({ success: false, message: "Product not found"})
   } 
@@ -80,6 +78,17 @@ router.route('/:id').delete((req, res) => {
   const foundProduct = inventory.find((item) => item.id === productId);
 
   res.send(foundProduct);
+}).put((req,res) => {
+  const productId = parseInt(req.params.id, 10);
+  const product= inventory.find(item => item.id === productId)
+// If the product doesn't exist, return a 404 status
+  if (!product) {
+    res.status(404).json({ success: false, message: "Product not found"})}
+// Extract the property from req.body
+  const newStockCount = req.body.stockCount;
+  product.stockCount = parseInt(newStockCount, 10);
+// Send a response back to the client so the fetch() resolves
+  res.status(200).json({ success: true, updatedProduct: product });
 })
 
 

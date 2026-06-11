@@ -1,57 +1,70 @@
-
-// Function to update product stock count on the server
-async function updateProductStock(id, newStockCount) {
-  try {
-    // Target endpoint containing the specific items ID
-    const response = await fetch(`/api/inventory/${id}`, {
-        method: 'PUT', // Use PUT for updates
-        headers: {
-          'Content-Type': 'application/json' // Tell Express to expect JSON string data
-        },
-        body: JSON.stringify({
-          stockCount: newStockCount // Pass the updated property value
-        })
+// Function to update server data and sync front-end
+async function updateProductStock(productId, newCount, cartory) {
+  const foundProduct = cartory.find(item => item.id === productId)
+  try{
+    const response = await fetch(`/api/inventory/${productId}`, {
+      method: 'PUT',
+      headers: {'Content-Type': 'application/json'}, // Tell Express to expect JSON string data
+    body: JSON.stringify({stockCount: newCount})
+    });
+    const responsed = await fetch(`/api/cart`, { // FIX ME
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'}, // Tell Express to expect JSON string data
+      body: JSON.stringify(foundProduct)
     });
 
-      // Catchs failures early
     if (!response.ok) {
       throw new Error(`Server responded with status: ${response.status}`);
     }
 
-    const data = await response.json();
-    console.log('Server response:');
-    console.log('Updated Object:');
-
-    // RE-SYNC THE UI: Clear existing products & Run layout function to refresh numbers
     syncStorefront();
-   syncAdminCatalog();
+    syncCartDetils();
 
   } catch (error) {
-    console.error("Failed to execute inventory update:", error);
+    console.error("Failed to execute inventory update:", error)
   }
 }
-// Handler for "Add to Cart" button clicks
+
+// Function to handle adding to cart
 const handleAddToCart = (productId, inventory) => {
-  const productIndex = inventory.findIndex(p => p.id === productId);
-  if (productIndex !== -1 && inventory[productIndex].stockCount > 0) {
-    inventory[productIndex].stockCount -= 1;
-    updateProductStock(productId, inventory[productIndex].stockCount);
+  // finds products
+  const foundProduct = inventory.find(item => item.id === productId);
+  if (foundProduct && foundProduct.stockCount > 0) {
+    foundProduct.stockCount -= 1; // updates the stock count
+    // pass updated count to server
+    updateProductStock(productId, foundProduct.stockCount, inventory)
   } else {
-    alert('Sorry, this product is out of stock!');
+    alert('Sorry, this product is out of stock')
   }
+}
+
+// Function to render cart detils
+function renderCartDetils(cartory) {
+  const cartSection = document.getElementById('cart-detile-section');
+  const cartCount = cartory.length; // count of cart
+  // calculates a total from an array
+  const cartTotal = cartory.reduce((total, product) => {
+    return total + (product.price * product.stockCount);
+  }, 0); // 0 is the starting value for 'total'
+ 
+  const cartCounter = document.createElement('h3')
+  cartCounter.textContent =`Total Items in Cart: ${cartCount}`; 
+  const cartPrice = document.createElement('h3')
+  cartPrice.textContent =`Total Cost of Cart: $${cartTotal}`;
+
+  cartSection.appendChild(cartCounter);
+  cartSection.appendChild(cartPrice);
 }
 
 // Function to render products on the page
 function renderProducts(inventory) {
-    const productSection = document.getElementById('product-grid');
+  console.log('Rendering storefront inventory...');
+  const productSection = document.getElementById('product-grid');
   if (!productSection) {
     console.error("Critical Error: Could not find the '#product-grid' element in the HTML DOM.");
     return; 
   }
 
-  // const sectionHeader = document.createElement('h2');
-  // sectionHeader.textContent = "Product Catalog";
-  // sectionHeader.id = "grid-heading"
   inventory.forEach(product => {
     const productCard = document.createElement('article');
     productCard.classList.add('product-card');
@@ -89,7 +102,7 @@ function renderProducts(inventory) {
 // Function to render the admin inventory catalog 
 function renderAdminCatalog(inventory) {
   console.log('Rendering admin catalog...');
-  const adminSection = document.getElementById('admin-inventory-table-body');
+  const adminCatalog = document.getElementById('admin-inventory-table-body');
   inventory.forEach(product => {
     const row = document.createElement('tr');
     row.innerHTML = `
@@ -99,7 +112,23 @@ function renderAdminCatalog(inventory) {
       <td>$${product.price.toFixed(2)}</td>
       <td>${product.stockCount}</td>
     `;
-    adminSection.appendChild(row);
+    adminCatalog.appendChild(row);
+  });
+}
+function renderAdminStock(inventory) {
+  console.log('Rendering admin Stcok Table...');
+  const adminStock = document.getElementById('admin-lowout-table-body');
+  inventory.forEach(product => {
+    const row = document.createElement('tr');
+    if (product.stockCount <= 3) {
+      row.innerHTML = `
+      <td>${product.id}</td>
+      <td>${product.name}</td>
+      <td>${product.stockCount}</td>
+      `;
+      adminStock.appendChild(row);
+    }
+    
   });
 }
 
@@ -227,25 +256,26 @@ async function syncStorefront() {
     const productSection = document.getElementById('product-grid');
     if (!productSection) return;
 
-    // 1. Clear out the old HTML elements
+    // Clear out the old HTML elements
     productSection.innerHTML = '';
 
-    // 2. Wait for initializeStorefront to fetch fresh data and redraw them
+    // Wait for initializeStorefront to fetch fresh data and redraw them
     await initStorefront();
 }
 
 // Fetches fresh data from the server and renders it
 async function initAdminCatalog() {
     try {
-        // 1. Fetch the latest inventory array from your backend route
+        // Fetch the latest inventory array from backend route
         const response = await fetch('/api/inventory');
         const data = await response.json();
         
-        // Handle if your server responds with an array directly or an object { inventory: [...] }
+        // if server responds with an array directly or an object { inventory: [...] }
         const currentInventory = Array.isArray(data) ? data : data.inventory;
 
-        // 2. Pass that fresh data right into your render function
+        // Pass that fresh data right into render function
         renderAdminCatalog(currentInventory);
+        renderAdminStock(currentInventory);
         
     } catch (error) {
         console.error("Error initializing admin catalog:", error);
@@ -257,13 +287,45 @@ async function syncAdminCatalog() {
     const productSection = document.getElementById('product-grid');
     if (!productSection) return;
 
-    // 1. Clear out the old HTML elements
+    // Clear out the old HTML elements
     productSection.innerHTML = '';
 
-    // 2. Wait for initializeStorefront to fetch fresh data and redraw them
+    // Wait for initAdminCatalog to fetch fresh data and redraw them
     await initAdminCatalog();
 }
 
+async function initCartDetils() {
+  try{
+    // Fetch the latest inventory array from backend route
+    const response = await fetch('/api/cart');
+    const data = await response.json();
+    // Check if the server returned a 404 or 500 error first
+    if (!response.ok) {
+      throw new Error(`Server error: ${response.status}`);
+    }
+    // if server responds with an array directly or an object { cart: [...] }
+    const currentCart = Array.isArray(data) ? data : data.cart;
+
+    // Pass that fresh data right into render function
+    renderCartDetils(currentCart);
+
+  } catch (error) {
+    console.error("Error initializing cart", error);
+    
+  }
+}
+
+async function syncCartDetils() {
+  const cartDetil = document.getElementById('cart-detile-section');
+  if (!cartDetil) return;
+
+  // Clear out the old HTML elements
+  cartDetil.innerHTML ='';
+
+  // wait for initCartDetils to fetch fresh data and redraw them
+  await initCartDetils();
+
+}
 
 // Call the initialization function when the page loads
 window.addEventListener('DOMContentLoaded', initStorefront);

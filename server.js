@@ -13,6 +13,8 @@ app.use(express.json())
 // Import the inventory router
 const inventoryRouter = require('./api/inventory')
 app.use('/api/inventory', inventoryRouter)
+const cartRouter = require('./api/cart')
+app.use('/api/cart', cartRouter)
 
 // app.get('/', (req, res) => {})
 

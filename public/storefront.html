@@ -33,21 +33,20 @@
         />
       </section>
 
-      <section
-        id="product-grid"
-        class="product-grid"
-        aria-labelledby="grid-heading"
-      >
+      <aside aria-label="Cart Summary">
+        <h2>Your Cart</h2>
+        <div id="cart-detile-section">
+          <!-- Cart detils load here -->
+        </div>
+      </aside>
+
+      <section aria-label="Product grid">
         <h2 id="grid-heading" class="visually-hidden">Product Catalog</h2>
+        <div id="product-grid" class="product-grid">
+          <!-- Products load here -->
+        </div>
       </section>
     </main>
-
-    <aside aria-label="Cart Summary">
-      <h2>Your Cart</h2>
-      <p>Items: <strong>2</strong></p>
-      <p>Total: <strong>$134.99</strong></p>
-      <button type="button" class="checkout-btn">Proceed to Checkout</button>
-    </aside>
 
     <footer>
       <p>2026 SuperStore Prototype v1.0.5</p>
