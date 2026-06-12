@@ -1,38 +1,60 @@
 // Function to update server data and sync front-end
-async function updateProductStock(productId, newCount, cartory) {
-  const foundProduct = cartory.find(item => item.id === productId)
+async function updateProductStock(productId, newCount) {
+  // const foundProduct = cartory.find(item => item.id === productId)
   try{
     const response = await fetch(`/api/inventory/${productId}`, {
-      method: 'PUT',
+      method: 'PATCH',
       headers: {'Content-Type': 'application/json'}, // Tell Express to expect JSON string data
-    body: JSON.stringify({stockCount: newCount})
-    });
-    const responsed = await fetch(`/api/cart`, { // FIX ME
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'}, // Tell Express to expect JSON string data
-      body: JSON.stringify(foundProduct)
+      body: JSON.stringify({stockCount: newCount})
     });
 
     if (!response.ok) {
       throw new Error(`Server responded with status: ${response.status}`);
     }
 
-    syncStorefront();
-    syncCartDetils();
+    await syncStorefront();
 
   } catch (error) {
     console.error("Failed to execute inventory update:", error)
   }
 }
 
+async function updateCart(foundProduct) {
+  const cartProduct = {
+    id: foundProduct.id,
+    name: foundProduct.name,
+    price: foundProduct.price,
+    quantity: 1,
+    cartid: null
+  };
+  try{
+    const response = await fetch(`/api/cart`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(cartProduct)
+    });
+
+    if (!response.ok) {
+      throw new Error(`Server responded with status: ${response.status}`);
+    }
+
+    await syncCartDetails();
+
+  } catch (error) {
+    console.error("Failed to execute cart update:", error)
+  }
+}
+
 // Function to handle adding to cart
-const handleAddToCart = (productId, inventory) => {
+const handleAddToCart = async (productId, inventory) => {
   // finds products
   const foundProduct = inventory.find(item => item.id === productId);
   if (foundProduct && foundProduct.stockCount > 0) {
     foundProduct.stockCount -= 1; // updates the stock count
     // pass updated count to server
-    updateProductStock(productId, foundProduct.stockCount, inventory)
+    await updateCart(foundProduct)
+    await updateProductStock(productId, foundProduct.stockCount)
+    
   } else {
     alert('Sorry, this product is out of stock')
   }
@@ -41,10 +63,13 @@ const handleAddToCart = (productId, inventory) => {
 // Function to render cart detils
 function renderCartDetils(cartory) {
   const cartSection = document.getElementById('cart-detile-section');
-  const cartCount = cartory.length; // count of cart
+  // counts the quantity of each product
+  const cartCount = cartory.reduce((count, product) => { 
+    return count +(product.quantity);
+  }, 0); // ) is the starting value for 'count'
   // calculates a total from an array
   const cartTotal = cartory.reduce((total, product) => {
-    return total + (product.price * product.stockCount);
+    return total + (product.price * product.quantity);
   }, 0); // 0 is the starting value for 'total'
  
   const cartCounter = document.createElement('h3')
@@ -245,6 +270,7 @@ async function initStorefront() {
 
         // Pass that fresh data right into your render function
         renderProducts(currentInventory);
+        syncCartDetails();
         
     } catch (error) {
         console.error("Error initializing storefront:", error);
@@ -297,7 +323,7 @@ async function syncAdminCatalog() {
 async function initCartDetils() {
   try{
     // Fetch the latest inventory array from backend route
-    const response = await fetch('/api/cart');
+    const response = await fetch(`/api/cart`);
     const data = await response.json();
     // Check if the server returned a 404 or 500 error first
     if (!response.ok) {
@@ -315,7 +341,7 @@ async function initCartDetils() {
   }
 }
 
-async function syncCartDetils() {
+async function syncCartDetails() {
   const cartDetil = document.getElementById('cart-detile-section');
   if (!cartDetil) return;
 

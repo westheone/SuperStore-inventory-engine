@@ -14,9 +14,15 @@ router.route('/').get( (req, res) => {
 }).post((req, res) => {
   const newProduct = req.body
 
+  // check if product already exists in cart
+  const existing = cart.find(item => item.id === newProduct.id)
+  if (existing) {
+    existing.quantity = (existing.quantity || 1) + 1
+    return res.status(200).json({ success: true, cart })
+  }
   // adds products
-  newProduct.cartid = inventory.length ? inventory[inventory.length - 1].id + 1 : 1; // Auto-increment ID
-  inventory.push(newProduct)
-  res.status(201).json({ success: true, inventory })
+  newProduct.cartid = cart.length ? cart[cart.length - 1].cartid + 1 : 1; // Auto-increment ID
+  cart.push(newProduct)
+  res.status(201).json({ success: true, cart })
 
 })

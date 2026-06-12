@@ -20,25 +20,34 @@
     </header>
 
     <main>
-      <h1>Available Inventory</h1>
-      <p>Browse our catalog of items in real-time.</p>
+      <div class="cart-search-grid">
+        <section
+          class="cart-details"
+          style="grid-area: box-1"
+          aria-label="Cart Summary"
+        >
+          <h2>Your Cart</h2>
+          <div id="cart-detile-section">
+            <!-- Cart detils load here -->
+          </div>
+        </section>
 
-      <section class="search-container" aria-label="Product Search">
-        <label id="search-label" for="storefront-search">Search items:</label>
-        <input
-          type="search"
-          id="storefront-search"
-          placeholder="Type to filter..."
-          aria-labelledby="search-label"
-        />
-      </section>
-
-      <aside aria-label="Cart Summary">
-        <h2>Your Cart</h2>
-        <div id="cart-detile-section">
-          <!-- Cart detils load here -->
-        </div>
-      </aside>
+        <section
+          class="search-container"
+          style="grid-area: box-2"
+          aria-label="Product Search"
+        >
+          <h1>Available Inventory</h1>
+          <p>Browse our catalog of items.</p>
+          <label id="search-label" for="storefront-search">Search items:</label>
+          <input
+            type="search"
+            id="storefront-search"
+            placeholder="Type to filter..."
+            aria-labelledby="search-label"
+          />
+        </section>
+      </div>
 
       <section aria-label="Product grid">
         <h2 id="grid-heading" class="visually-hidden">Product Catalog</h2>
