@@ -142,7 +142,7 @@ function renderAdminCatalog(inventory) {
       <td>${product.id}</td>
       <td>${product.name}</td>
       <td>${product.category}</td>
-      <td>$${product.price.toFixed(2)}</td>
+      <td>$${(product.price ?? 0).toFixed(2)}</td>
       <td>${product.stockCount}</td>
     `;
     adminCatalog.appendChild(row);
@@ -262,6 +262,7 @@ const handleUpdateProduct = async (event) => {
       throw new Error(`Server responded with status: ${reponse.status}`);
     }
     console.log('Product Updated')
+     console.log(updatedProduct)
     form.reset(); // Clear the form after submission
     syncStorefront();
     syncAdminCatalog();
@@ -270,20 +271,52 @@ const handleUpdateProduct = async (event) => {
     console.error("Failed to update product:", error);
   }
 }
+// for filtering the invetntory
+let searchInventory = []
+
+// search bar - fillters search inventory
+function enableStorefrontSearch() {
+    const searchInput = document.getElementById('storefront-search');
+    const productSection = document.getElementById('product-grid');
+    
+    // if the elements aren't on this current page, stop here
+    if (!searchInput || !productSection) return;
+
+    searchInput.addEventListener('input', (event) => {
+        const searchTerm = event.target.value.toLowerCase();
+        
+        // filter the search inventory by name or category (maybe by price later)
+        const filteredResults = searchInventory.filter(product => {
+            return product.name.toLowerCase().includes(searchTerm) || 
+                   product.category.toLowerCase().includes(searchTerm);
+        });
+        
+        // clears out of the grid
+        productSection.innerHTML = '';
+        
+        // render only the matching items
+        renderProducts(filteredResults);
+    });
+}
+
+// EXECUTE IT ONCE WHEN THE PAGE LOADS
+enableStorefrontSearch();
 
 // Fetches fresh data from the server and renders it
 async function initStorefront() {
   // if this page doesn't have product-grid, it's not the storefront
   if (!document.getElementById('product-grid')) return;
     try {
-        // Fetch the latest inventory array from your backend route
+        // Fetch the latest inventory array from  backend route
         const response = await fetch('/api/inventory');
         const data = await response.json();
         
         // Handle if server responds with an array directly or an object { inventory: [...] }
         const currentInventory = Array.isArray(data) ? data : data.inventory;
 
-        // Pass that fresh data right into your render function
+        
+        // Pass fresh data right into render functions and search inventory
+        searchInventory = currentInventory;
         renderProducts(currentInventory);
         syncCartDetails();
         
