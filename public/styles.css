@@ -50,7 +50,7 @@ h1 {
   color: white;
 }
 
-/* styles for navigation */
+/* navigation styles */
 nav ul {
   list-style: none;
   display: flex;
@@ -64,15 +64,50 @@ nav ul li a {
   text-decoration: none;
   font-weight: bold;
 }
-
 nav ul li a:hover {
   color: #3b82f6;
 }
 
-/* styles for product cards */
+/* table styles */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+th, td {
+  padding: 8px;
+  text-align: left;
+  border-bottom: 1px solid #27272a;
+}
+th {
+  background-color: #09090b;
+  color: white;
+  border-left: 1px solid white;
+  border-right: 1px solid white;
+}
+td {
+
+  color: white;
+  outline: 1px solid #27272c;
+}
+
+.logo {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #3b82f6;
+}
+/*  */
+.cart-search-grid{
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  grid-template-rows: 1fr;
+  gap: 1rem;
+  grid-template-areas:"box-2 box-1" ;
+}
+/* product cards styles  */
 .product-grid {
   display: grid;
-  grid-template-areas: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  justify-content: center;
   gap: 16px;
 }
 
@@ -146,7 +181,7 @@ nav ul li a:hover {
   color: #10b981;
 }
 
-/* styles for buttons */
+/* buttons styles  */
 .button-look {
   max-width: 150px;
   background: #1136f2;
@@ -155,12 +190,62 @@ nav ul li a:hover {
   border-radius: 10px;
   font-size: medium;
   transition: background-color 0.5s ease;
-  }
+}
 
 .button-look:hover {
   background: #0a28c1;
-  }
+}
 
 
 
-/*  */
+/* inventory form styles */
+.inventory-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 400px;
+}
+
+.inventory-form label {
+  font-weight: 600;
+}
+
+.inventory-form input {
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #27272a;
+  background-color: white;
+  color: black;
+}
+
+.inventory-form input[type="submit"] {
+  background: #1136f2;
+  padding: 0.5rem 1rem;
+  color: white;
+  border-radius: 10px;
+  font-size: medium;
+  transition: background-color 0.5s ease;
+}
+
+.inventory-form input[type="submit"]:hover {
+  background: #0a28c1;
+}
+
+/* admin layout styles */
+.admin-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 32px;
+}
+
+.admin-form-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 32px;
+}
+
+.admin-inventory-catalog {
+  flex-basis: 100%;
+}
