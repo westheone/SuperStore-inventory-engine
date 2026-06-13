@@ -89,6 +89,7 @@ function renderProducts(inventory) {
     console.error("Critical Error: Could not find the '#product-grid' element in the HTML DOM.");
     return; 
   }
+  
 
   inventory.forEach(product => {
     const productCard = document.createElement('article');
@@ -128,6 +129,13 @@ function renderProducts(inventory) {
 function renderAdminCatalog(inventory) {
   console.log('Rendering admin catalog...');
   const adminCatalog = document.getElementById('admin-inventory-table-body');
+
+  // Add this guard clause to prevent the error:
+  if (!adminCatalog) {
+      console.log('Admin catalog table body not found on this page.');
+      return; 
+  }
+
   inventory.forEach(product => {
     const row = document.createElement('tr');
     row.innerHTML = `
@@ -143,6 +151,12 @@ function renderAdminCatalog(inventory) {
 function renderAdminStock(inventory) {
   console.log('Rendering admin Stcok Table...');
   const adminStock = document.getElementById('admin-lowout-table-body');
+
+  // Add this guard clause to prevent the error:
+  if (!adminStock) {
+      console.log('Admin Stock table body not found on this page.');
+      return; 
+    }
   inventory.forEach(product => {
     const row = document.createElement('tr');
     if (product.stockCount <= 3) {
@@ -153,7 +167,6 @@ function renderAdminStock(inventory) {
       `;
       adminStock.appendChild(row);
     }
-    
   });
 }
 
@@ -260,6 +273,8 @@ const handleUpdateProduct = async (event) => {
 
 // Fetches fresh data from the server and renders it
 async function initStorefront() {
+  // if this page doesn't have product-grid, it's not the storefront
+  if (!document.getElementById('product-grid')) return;
     try {
         // Fetch the latest inventory array from your backend route
         const response = await fetch('/api/inventory');
@@ -291,6 +306,8 @@ async function syncStorefront() {
 
 // Fetches fresh data from the server and renders it
 async function initAdminCatalog() {
+  // if this page doesn't have the admin table, it's not the admin page
+  if (!document.getElementById('admin-inventory-table-body')) return;
     try {
         // Fetch the latest inventory array from backend route
         const response = await fetch('/api/inventory');
@@ -354,6 +371,8 @@ async function syncCartDetails() {
 }
 
 // Call the initialization function when the page loads
-window.addEventListener('DOMContentLoaded', initStorefront);
-window.addEventListener('DOMContentLoaded', initAdminCatalog);
+document.addEventListener('DOMContentLoaded', () => {
+  initStorefront();    // skips itself if not on storefront page
+  initAdminCatalog();  // skips itself if not on admin page
+});
 

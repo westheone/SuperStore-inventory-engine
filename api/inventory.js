@@ -80,7 +80,7 @@ router.route('/:id').delete((req, res) => {
 
   res.send(foundProduct);
 })
-// PUT not needed ??
+// PUT not needed ?
 /* .put((req,res) => {
   const productId = parseInt(req.params.id, 10);
   const product= inventory.find(item => item.id === productId)
