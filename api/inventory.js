@@ -62,8 +62,8 @@ router.route('/:id').delete((req, res) => {
   // updates fields with data in it only
   if (name !== undefined && name.trim() !== "") { product.name = name; }
   if (category !== undefined && category.trim() !== "") {product.category = category; }
-  if (price !== undefined && price !== NaN) { product.price = parseFloat(price); } 
-  if (stockCount !== undefined && price !== NaN) {product.stockCount = parseInt(stockCount, 10); } 
+  if (price !== undefined && price !== null) { product.price = parseFloat(price); } 
+  if (stockCount !== undefined && stockCount !== null) {product.stockCount = parseInt(stockCount, 10); } 
 
   console.log(`Product ID ${productId} successfully patched!`);
 

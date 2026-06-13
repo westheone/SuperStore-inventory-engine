@@ -237,12 +237,19 @@ const handleDeleteProduct = async (event) => {
 const handleUpdateProduct = async (event) => {
   event.preventDefault()
   const form = document.getElementById('update-inventory-form')
+
+  // Extract all input values first for readability
+  const nameInput = form.elements['product-name'].value;
+  const categoryInput = form.elements['product-category'].value;
+  const priceInput = form.elements['product-price'].value;
+  const stockInput = form.elements['product-stock'].value;
+
   const updatedProduct = {
-    id: parseInt(form.elements['product-id'].value,10),
-    name: form.elements['product-name'].value,
-    category: form.elements['product-category'].value,
-    price: parseFloat(form.elements['product-price'].value),
-    stockCount: parseInt(form.elements['product-stock'].value, 10)
+    id: parseInt(form.elements['product-id'].value, 10), // Always required
+    ...(nameInput !== '' && { name:       nameInput }),
+    ...(categoryInput !== '' && { category:   categoryInput }),
+    ...(priceInput !== '' && { price:      parseFloat(priceInput) }),
+    ...(stockInput !== '' && { stockCount: parseInt(stockInput, 10) })
   }
 
   if (isNaN(updatedProduct.id)) {
