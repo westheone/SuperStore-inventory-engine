@@ -4,7 +4,7 @@
 // add / update / delete product forms.
 // Extracted from app.js — storefront-only code removed.
 // ============================================================
-
+/*
 // Function to render products on the page
 function renderProducts(inventory) {
   console.log('Rendering storefront inventory...');
@@ -49,7 +49,7 @@ function renderProducts(inventory) {
     productSection.appendChild(productCard);
   });
 }
-
+*/
 // Function to render the admin inventory catalog  and Stock tablr
 function renderAdminCatalog(inventory) {
   console.log('Rendering admin catalog...');
@@ -124,8 +124,8 @@ const handleAddProduct = async (event) => {
     console.log('Added Product:');
     // RE-SYNC THE UI: Clear existing products & Run layout function to refresh numbers
     form.reset(); // Clear the form after submission
-    syncStorefront();
-    syncAdminCatalog();
+    // syncStorefront();
+    syncAdminPage();
 
   } catch (error) {
     console.error("Failed to add product:", error);
@@ -151,8 +151,8 @@ const handleDeleteProduct = async (event) => {
     }
     console.log('Product Deleted')
     form.reset();
-    syncStorefront()
-    syncAdminCatalog()
+    // syncStorefront()
+    syncAdminPage()
 
   } catch (error) {
     console.error("Failed to delete product:", error);
@@ -196,8 +196,8 @@ const handleUpdateProduct = async (event) => {
     console.log('Product Updated')
      console.log(updatedProduct)
     form.reset(); // Clear the form after submission
-    syncStorefront();
-    syncAdminCatalog();
+    // syncStorefront();
+    syncAdminPage();
 
   } catch (error) {
     console.error("Failed to update product:", error);
@@ -227,8 +227,13 @@ async function initAdminPage() {
 
 // Clears the DOM grid and triggers a fresh fetch-and-render
 async function syncAdminPage() {
+    const adminCatalog = document.getElementById('admin-inventory-table-body');
+    const adminStock = document.getElementById('admin-lowout-table-body');
+    if (!adminStock || adminCatalog) return;
+
     // Clear out the old HTML elements
-    productSection.innerHTML = '';
+    adminCatalog.innerHTML = '';
+    adminStock.innerHTML = '';
 
     // Wait for initAdminPage to fetch fresh data and redraw them
     await initAdminPage();
