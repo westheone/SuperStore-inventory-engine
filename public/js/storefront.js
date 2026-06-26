@@ -58,10 +58,7 @@ async function updateProductStock(productId, newCount) {
 async function updateCart(foundProduct) {
   const cartProduct = {
     id: foundProduct.id,
-    name: foundProduct.name,
-    price: foundProduct.price,
     quantity: 1,
-    cartid: null
   };
   try{
     const response = await fetch(`/api/cart`, {
@@ -100,18 +97,18 @@ const handleAddToCart = async (productId, inventory) => {
 function renderCartDetils(cartory) {
   const cartSection = document.getElementById('cart-detile-section');
   // counts the quantity of each product
-  const cartCount = cartory.reduce((count, product) => {
-    return count +(product.quantity);
+  const cartCount = cartory.reduce((count, item) => {
+    return count +(item.quantity);
   }, 0); // ) is the starting value for 'count'
   // calculates a total from an array
-  const cartTotal = cartory.reduce((total, product) => {
-    return total + (product.price * product.quantity);
+  const cartTotal = cartory.reduce((total, item) => {
+    return total + (item.product.price * item.quantity);
   }, 0); // 0 is the starting value for 'total'
 
   const cartCounter = document.createElement('h3')
   cartCounter.textContent =`Total Items in Cart: ${cartCount}`;
   const cartPrice = document.createElement('h3')
-  cartPrice.textContent =`Total Cost of Cart: $${cartTotal}`;
+  cartPrice.textContent =`Total Cost of Cart: $${cartTotal.toFixed(2)}`;
 
   cartSection.appendChild(cartCounter);
   cartSection.appendChild(cartPrice);

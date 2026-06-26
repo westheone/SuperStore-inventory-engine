@@ -1,0 +1,8 @@
+model Product {
+  id         Int        @id @default(autoincrement())
+  name       String
+  category   String?    @default("Home Goods")
+  price      Float
+  stockCount Int
+  cartItems  CartItem[]
+}

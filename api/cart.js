@@ -1,28 +1,34 @@
 const express = require("express")
 const router = express.Router()
+const prisma = require('../prisma/prisma.client');
 
 module.exports = router
 
 // cart (in-memory)
-const cart = []
+//const cart = []
 
-router.route('/').get( (req, res) => { 
+router.route('/').get( async (req, res) => { 
+  const cart = await prisma.cartItem.findMany({
+    include: {product: {select: {price: true, name: true, category: true}}}
+  })
+  res.status(200).json({ success: true, cart }) // sends the cart db JSON response
 
-  res.status(200).json({ success: true, cart }) // sends the cart inventory JSON response
+  // POST - adds product data to cart db
+}).post(async (req, res) => {
+  const { id, quantity } = req.body
 
-  // POST - adds product data to invertory
-}).post((req, res) => {
-  const newProduct = req.body
+  // Check if product already exists in cart
+  const existing = await prisma.cartItem.findFirst({ where: { productId: id } })
 
-  // check if product already exists in cart
-  const existing = cart.find(item => item.id === newProduct.id)
   if (existing) {
-    existing.quantity = (existing.quantity || 1) + 1
-    return res.status(200).json({ success: true, cart })
+    await prisma.cartItem.update({
+      where: { cartid: existing.cartid },
+      data: { quantity: { increment: quantity } }
+    })
+    return res.status(200).json({ success: true })
   }
-  // adds products
-  newProduct.cartid = cart.length ? cart[cart.length - 1].cartid + 1 : 1; // Auto-increment ID
-  cart.push(newProduct)
-  res.status(201).json({ success: true, cart })
 
+  // Product not in cart yet — create a new CartItem
+  await prisma.cartItem.create({ data: { productId: id, quantity: quantity } })
+  res.status(200).json({ success: true })
 })
