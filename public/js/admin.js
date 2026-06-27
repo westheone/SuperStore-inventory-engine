@@ -4,52 +4,7 @@
 // add / update / delete product forms.
 // Extracted from app.js — storefront-only code removed.
 // ============================================================
-/*
-// Function to render products on the page
-function renderProducts(inventory) {
-  console.log('Rendering storefront inventory...');
-  const productSection = document.getElementById('product-grid');
-  if (!productSection) {
-    console.error("Critical Error: Could not find the '#product-grid' element in the HTML DOM.");
-    return; 
-  }
-  
 
-  inventory.forEach(product => {
-    const productCard = document.createElement('article');
-    productCard.classList.add('product-card');
-
-    const categoryTag = document.createElement('span');
-    categoryTag.classList.add('category-tag');
-    categoryTag.textContent = product.category;
-    productCard.appendChild(categoryTag);
-
-    const productTitle = document.createElement('h3');
-    productTitle.classList.add('product-title');
-    productTitle.textContent = product.name;
-    productCard.appendChild(productTitle);
-
-    const priceText = document.createElement('p');
-    priceText.classList.add('price-text');
-    priceText.textContent = `$${product.price.toFixed(2)}`;
-    productCard.appendChild(priceText);
-
-    const stockText = document.createElement('p');
-    stockText.classList.add('instock-text');
-    stockText.textContent = `In Stock: ${product.stockCount}`;
-    productCard.appendChild(stockText);
-
-    const addToCartBtn = document.createElement('button');
-    addToCartBtn.classList.add('button-look');
-    addToCartBtn.setAttribute('type', 'button');
-    addToCartBtn.textContent = 'Add to Cart';
-    addToCartBtn.addEventListener('click', () => handleAddToCart(product.id,inventory));
-    productCard.appendChild(addToCartBtn);
-
-    productSection.appendChild(productCard);
-  });
-}
-*/
 // Function to render the admin inventory catalog  and Stock tablr
 function renderAdminCatalog(inventory) {
   console.log('Rendering admin catalog...');
@@ -135,7 +90,7 @@ const handleAddProduct = async (event) => {
 const handleDeleteProduct = async (event) => {
   event.preventDefault();
   const form = document.getElementById('delete-product-form');
-  const deleteProductId = parseInt(form.elements['product-id'].value,10);
+  const deleteProductId = parseInt(form.elements['delete-product-id'].value,10);
   if (isNaN(deleteProductId)) {
     console.error("Invalid Product ID, Can't Find Product")
     return;
@@ -164,13 +119,13 @@ const handleUpdateProduct = async (event) => {
   const form = document.getElementById('update-inventory-form')
 
   // Extract all input values first for readability
-  const nameInput = form.elements['product-name'].value;
-  const categoryInput = form.elements['product-category'].value;
-  const priceInput = form.elements['product-price'].value;
-  const stockInput = form.elements['product-stock'].value;
+  const nameInput = form.elements['update-product-name'].value;
+  const categoryInput = form.elements['update-product-category'].value;
+  const priceInput = form.elements['update-product-price'].value;
+  const stockInput = form.elements['update-product-stock'].value;
 
   const updatedProduct = {
-    id: parseInt(form.elements['product-id'].value, 10), // Always required
+    id: parseInt(form.elements['update-product-id'].value, 10), // Always required
     ...(nameInput !== '' && { name:       nameInput }),
     ...(categoryInput !== '' && { category:   categoryInput }),
     ...(priceInput !== '' && { price:      parseFloat(priceInput) }),
@@ -194,7 +149,7 @@ const handleUpdateProduct = async (event) => {
       throw new Error(`Server responded with status: ${reponse.status}`);
     }
     console.log('Product Updated')
-     console.log(updatedProduct)
+    console.log(updatedProduct)
     form.reset(); // Clear the form after submission
     // syncStorefront();
     syncAdminPage();
@@ -229,7 +184,7 @@ async function initAdminPage() {
 async function syncAdminPage() {
     const adminCatalog = document.getElementById('admin-inventory-table-body');
     const adminStock = document.getElementById('admin-lowout-table-body');
-    if (!adminStock || adminCatalog) return;
+    if (!adminStock || !adminCatalog) return;
 
     // Clear out the old HTML elements
     adminCatalog.innerHTML = '';
