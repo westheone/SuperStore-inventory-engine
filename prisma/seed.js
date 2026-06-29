@@ -1,6 +1,7 @@
 const prisma = require('./prisma.client');
 
 async function main() {
+  await prisma.product.deleteMany()
   const inventory = await prisma.product.createMany({
     data:[
     { name: "Premium Wireless Headphones", category: "Electronics", price: 129.99, stockCount: 15 },
