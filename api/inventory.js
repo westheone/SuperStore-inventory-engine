@@ -1,96 +1,96 @@
 const express = require("express")
 const router = express.Router()
+const prisma = require('../prisma/prisma.client');
 
 module.exports = router
 
-// database simulation (in-memory)
-// old fromat { id: 10, name: "4K Ultra HD Action Camera", category: "Electronics", price: 149.99, stockCount: 7, cartid: undefined }
-const inventory = [
-  { id: 1, name: "Premium Wireless Headphones", category: "Electronics", price: 129.99, stockCount: 15 },
-  { id: 2, name: "Ergonomic Office Chair", category: "Furniture", price: 249.99, stockCount: 3 },
-  { id: 3, name: "Stainless Steel Water Bottle", category: "Fitness", price: 24.99, stockCount: 0  },
-  { id: 4, name: "Smart LED Desk Lamp", category: "Electronics", price: 59.99, stockCount: 8  },
-  { id: 5, name: "Memory Foam Pillow", category: "Furniture", price: 39.99, stockCount: 12 },
-  { id: 6, name: "Yoga Mat with Carrying Strap", category: "Fitness", price: 29.99, stockCount: 5 },
-  { id: 7, name: "Bluetooth Speaker", category: "Electronics", price: 89.99, stockCount: 2 },
-  { id: 8, name: "Adjustable Standing Desk Converter", category: "Furniture", price: 199.99, stockCount: 4 },
-  { id: 9, name: "Resistance Bands Set", category: "Fitness", price: 19.99, stockCount: 20 },
-  { id: 10, name: "4K Ultra HD Action Camera", category: "Electronics", price: 149.99, stockCount: 7 },
-]
 
   // route to GET and POST for invertory
   // GET - to load the inventory data on the frontend
-router.route('/').get( (req, res) => { 
-  // console.log('Inventory requested')
-  res.status(200).json({ success: true, inventory }) // sends the inventory JSON response
-
-  // POST - adds product data to invertory
-}).post((req, res) => {
-  const newProduct = req.body
-
-  // adds products
-  newProduct.id = inventory.length ? inventory[inventory.length - 1].id + 1 : 1; // Auto-increment ID
-  inventory.push(newProduct)
-  res.status(201).json({ success: true, inventory })
-})
-
-router.route('/:id').delete((req, res) => {
-  const deleteProductId = parseInt(req.params.id, 10);
-    
-    // Find the index of the product with the matching ID
-  const productIndex = inventory.findIndex(product => product.id === deleteProductId);
-    
-    // If the product doesn't exist, return a 404 status
-  if (productIndex === -1) {
-    return res.status(404).json({ success: false, message: "Product not found" });
+router.route('/').get(async (req, res) => { 
+  try {
+    const inventory = await prisma.product.findMany();
+    res.status(200).json({success: true, inventory}) // sends the inventory JSON response
+  } catch (error) {
+    console.error("Failed to GET/load inventory", error);
+    res.status(500).json({success:false, message:"Failed to GET/load inventory"})
   }
-    
-    // Remove the product from in-memory array
-  inventory.splice(productIndex, 1);
-    
-    // Respond back with the updated inventory array
-  res.status(200).json({ success: true, inventory });
-}).patch((req,res) => {
-  const productId = parseInt(req.params.id, 10);
-  const product= inventory.find(item => item.id === productId)
-  // If the product doesn't exist, return a 404 status
-  if (!product) {
-    res.status(404).json({ success: false, message: "Product not found"})
-  } 
-  const { name, category, price, stockCount } = req.body;
+  
+  // POST - adds product data to invertory
+}).post( async (req, res) => {
+  const {name, category, price, stockCount} = req.body
 
-  // updates fields with data in it only
-  if (name !== undefined && name.trim() !== "") { product.name = name; }
-  if (category !== undefined && category.trim() !== "") {product.category = category; }
-  if (price !== undefined && price !== null) { product.price = parseFloat(price); } 
-  if (stockCount !== undefined && stockCount !== null) {product.stockCount = parseInt(stockCount, 10); } 
+  if (typeof name !== "string"|| !name) {
+    return res.status(400).json({ success: false, message: "Product name is required"});
+  }
+  if (typeof category !== "string" || !category) {
+    return res.status(400).json({ success: false, message: "Product category is required"});
+  }
+  if(typeof price !== "number" || price < 0) {
+    return res.status(400).json({ success: false, message: "Price must be a number greater then 0"});
+  }
+  if(typeof stockCount !== "number" || stockCount < 0) {
+    return res.status(400).json({success: false, message: "Stock count must be a non-negative number"})
+  }
 
-  console.log(`Product ID ${productId} successfully patched!`);
-
-  // Return status 200 and hand back the updated data set
-  res.status(200).json({ 
-    success: true, 
-    message: "Product updated successfully!", 
-    updatedProduct: product
+  try {
+    const newProduct = await prisma.product.create({
+    data: {name, category, price, stockCount},
   })
-
-}).get((req,res) => {
-  const  productId  = parseInt(req.params.id, 10);
-  const foundProduct = inventory.find((item) => item.id === productId);
-
-  res.send(foundProduct);
+  res.status(201).json({success: true})
+  } catch (error) {
+    console.error("Faild to POST/add Product");
+    res.status(500).json({success:false, message:"Faild to POST/add Product"})
+  }
 })
-// PUT not needed ?
-/* .put((req,res) => {
-  const productId = parseInt(req.params.id, 10);
-  const product= inventory.find(item => item.id === productId)
-// If the product doesn't exist, return a 404 status
-  if (!product) {
-    res.status(404).json({ success: false, message: "Product not found"})}
-// Extract the property from req.body
-  const newStockCount = req.body.stockCount;
-  product.stockCount = parseInt(newStockCount, 10);
-// Send a response back to the client so the fetch() resolves
-  res.status(200).json({ success: true, updatedProduct: product });
+
+router.route('/:id').delete( async (req, res) => {
+  try {
+    await prisma.product.delete({where: {id: parseInt(req.params.id, 10)}})
+  const inventory = await prisma.product.findMany();
+  res.status(200).json({success: true, inventory})
+  } catch (error) {
+    console.error("Failed to DELETE Product");
+    res.status(500).json({success:false, message:"Failed to DELETE Product"})
+  }
+}).patch( async (req,res) => {
+  const { name, category, price, stockCount } = req.body
+
+  if (name !== undefined && (typeof name !== "string" || !name)) {
+  return res.status(400).json({ success: false, message: "Product name is required"});
+  }
+  if (price !== undefined && (typeof price !== "number" || price <= 0)) {
+  return res.status(400).json({ success: false, message: "Price must be a positive number"});
+  }
+  if (stockCount !== undefined && (!Number.isInteger(stockCount) || stockCount < 0)) {
+  return res.status(400).json({success: false, message: "Stock count must be a non-negative nuber"});
+  }
+
+  try {
+    const updated = await prisma.product.update({
+    where: { id: parseInt(req.params.id) },
+    data: {
+      ...(name       && { name }),
+      ...(category   && { category }),
+      ...(price      && { price: parseFloat(price) }),
+      ...(stockCount !== undefined && { stockCount: parseInt(stockCount) })
+    }
+  })
+  res.status(200).json({ success: true, updatedProduct: updated })
+  } catch (error) {
+    console.error("Failed to PATCH/update Product", error);
+    res.status(500).json({success:false, message:"Failed to PATCH/update Product"})
+  }
+
+}).get( async (req,res) => {
+  try {
+    const product = await prisma.product.findUnique({
+    where: { id: parseInt(req.params.id) }
+  })
+  if (!product) return res.status(404).json({ success: false, message: "Not found" })
+  res.status(200).json(product)
+  } catch (error) {
+    console.error("Failed to GET/load Product", error);
+    res.status(500).json({success:false, message:"Failed to GET/load Product"})
+  }
 })
-*/
