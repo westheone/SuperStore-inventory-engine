@@ -1,6 +1,16 @@
+@import "tailwindcss";
+
+:root {
+  --textm-color: white;
+  --bg-color: #271d2f;
+  --card-color: #413f41;       
+  --border-color: #27272a; 
+  --button-bg: #1136f2;
+  --button-hover-bg: #0a28c1;
+
+}
 
 
-/* styles for all basic elements */
 body {
   background-color: #18181b;
   color: white;
@@ -67,6 +77,10 @@ nav ul li a {
 nav ul li a:hover {
   color: #3b82f6;
 }
+nav p {
+  font-size: 1rem;
+  font-weight: 700;
+}
 
 /* table styles */
 table {
@@ -101,7 +115,13 @@ td {
   grid-template-columns: 1fr 300px;
   grid-template-rows: 1fr;
   gap: 1rem;
-  grid-template-areas:"box-2 box-1" ;
+  grid-template-areas:"search-container cart-details" ;
+}
+.search-bar{
+  margin-left: 10px;
+  background-color: white;
+  color: #000000;
+  font-weight: 600;
 }
 /* product cards styles  */
 .product-grid {
@@ -218,7 +238,7 @@ td {
   color: black;
 }
 
-.inventory-form input[type="submit"] {
+.inventory-form button[type="submit"] {
   background: #1136f2;
   padding: 0.5rem 1rem;
   color: white;
@@ -227,7 +247,7 @@ td {
   transition: background-color 0.5s ease;
 }
 
-.inventory-form input[type="submit"]:hover {
+.inventory-form button[type="submit"]:hover {
   background: #0a28c1;
 }
 
@@ -237,6 +257,7 @@ td {
   flex-direction: row;
   flex-wrap: wrap;
   gap: 32px;
+  margin-top: 20px;
 }
 
 .admin-form-container {
@@ -248,4 +269,10 @@ td {
 
 .admin-inventory-catalog {
   flex-basis: 100%;
+}
+
+.two-section-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
 }
