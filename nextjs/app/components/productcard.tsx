@@ -23,8 +23,7 @@ export default function ProductCard (product: Product, onAddToCart: (product: Pr
         disabled={product.stockCount === 0}
         onClick={() => onAddToCart(product)}
       >
-        Add to Cart
-      </button>
+        Add to Cart</button>
 
     </article>
   )
