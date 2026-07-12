@@ -1,6 +1,11 @@
 import { CartItem } from "../lib/cartitme";
 
-export default function ItemCard(item: CartItem, onDeleteItem: (item: CartItem) => void) {
+type Props = {
+item: CartItem, 
+onDeleteItem: (item: CartItem) => void
+}
+
+export default function ItemCard({item, onDeleteItem}: Props) {
   return(
     <article className="product-card">
       <h3 className='product-title'>{item.product.name}</h3>
@@ -9,9 +14,7 @@ export default function ItemCard(item: CartItem, onDeleteItem: (item: CartItem) 
         <p className='price-text'>Qty: {item.quantity}</p>
       </div>
       <p className='price-text'>Subtotal: ${(item.quantity * item.product.price).toFixed(2)}</p>
-      <button 
-      className="button-look" 
-      >- 1</button>
+      <button className="button-look" onChange={() => onDeleteItem(item)}>- 1</button>
     </article>
   )
 }

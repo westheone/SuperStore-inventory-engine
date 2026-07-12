@@ -1,6 +1,11 @@
 import { Product } from "../lib/product";
 
-export default function ProductCard (product: Product, onAddToCart: (product: Product) => void ) {
+type Props = {
+  product: Product,
+  onAddToCart: (id:number) => void
+}
+
+export default function ProductCard ({product, onAddToCart}: Props) {
 
   const stockStatus =
   product.stockCount === 0 ? "outofstock" :
@@ -21,7 +26,7 @@ export default function ProductCard (product: Product, onAddToCart: (product: Pr
       <button
         className="button-look"
         disabled={product.stockCount === 0}
-        onClick={() => onAddToCart(product)}
+        onClick={() => onAddToCart(product.id)}
       >
         Add to Cart</button>
 

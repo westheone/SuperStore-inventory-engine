@@ -1,5 +1,5 @@
 import {prisma} from "@/app/lib/prisma";
-import { CartItem } from "@prisma/client";
+import { CartItem } from "@/app/lib/cartitme"
 import { NextResponse } from 'next/server';
 
 
