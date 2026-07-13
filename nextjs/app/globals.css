@@ -262,10 +262,15 @@ td {
 
 .admin-form-container {
   display: flex;
-  flex-direction: row;
+  flex-direction:row;
   flex-wrap: nowrap;
-  gap: 32px;
+  gap: 10px;
 }
+
+.admin-lowstock-container{
+max-width: fit-content;
+min-width: none;
+} 
 
 .admin-inventory-catalog {
   flex-basis: 100%;
@@ -274,5 +279,5 @@ td {
 .two-section-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 32px;
+  gap: 10px;
 }

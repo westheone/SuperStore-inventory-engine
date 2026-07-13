@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 const navlinks = [
-  {name: 'StoreFront', href: '/storefront'},
+  {name: 'StoreFront', href: '/store'},
   {name:'Cart', href: '/cart'},
   {name: 'Admin', href: '/admin'}
 ]

@@ -29,13 +29,8 @@ export async function PATCH(
   if (Number.isNaN(productid)) {
     return NextResponse.json({ message: "Invalid product id" }, { status: 400 })
   }
-  const { name, category, price, stockCount }: Partial<Product> = await req.json()
-  if (name !== undefined && (typeof name !== "string" || !name)) {
-    return NextResponse.json({ message: "Product name must be text" }, { status: 400 })
-  }
-  if (category !== undefined && (typeof category !== "string" || !category)) {
-    return NextResponse.json({ message: "Product category must be text" }, { status: 400 })
-  }
+  let { price, stockCount }: Partial<Product> = await req.json()
+  
   if (price !== undefined && (typeof price !== "number" || price < 0)) {
     return NextResponse.json({ message: "Price must be a number greater then 0" }, { status: 400 })
   }
@@ -49,9 +44,12 @@ export async function PATCH(
       return NextResponse.json({ message: "Not a valid Product Id" }, { status: 400 })
     }
 
+    if (price === 0) { price = existing.price}
+    if (stockCount === 0) {stockCount = existing.stockCount}
+
     const updated = await prisma.product.update({
       where: { id: productid },
-      data: { name, category, price, stockCount }
+      data: { price: price, stockCount: stockCount }
     })
     return NextResponse.json({ updatedProduct: updated }, { status: 200 })
   } catch (error) {

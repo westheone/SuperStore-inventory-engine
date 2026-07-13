@@ -6,7 +6,7 @@ import { NextResponse } from 'next/server';
 export async function GET() {
   try {
     const cart = await prisma.cartItem.findMany({
-      include: {product: {select: {price: true, name: true, category: true}}}
+      include: {product: {select: {price: true, name: true}}}
     })
     return NextResponse.json({cart}, {status: 200})
   } catch (error) {

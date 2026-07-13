@@ -1,6 +1,10 @@
 import { Product } from "../lib/product";
 
-export default function LowStockRow(product: Product) {
+type Props = {
+  product: Product
+}
+
+export default function LowStockRow({product}:Props) {
   return(
     <tr>
       <td>{product.id}</td>
