@@ -17,7 +17,12 @@ export default function RootLayout({
       
       <body>
         <NavLinks/>
-        {children}
+        <main>
+          {children}
+        </main>
+        <footer>
+          <p>Developer: Wesley S.  v 0.5</p>
+        </footer>
       </body>
     </html>
   );

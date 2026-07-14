@@ -10,11 +10,30 @@
 
 }
 
+html {
+  height: fill;
+  width: fill;
+}
 
 body {
   background-color: #18181b;
   color: white;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  /* padding-top: 16px;
+  padding-left: 16px;
+  padding-right: 16px; */
+
+}
+
+main {
+  padding: 16px;
+  flex: 1;
+}
+
+div {
   margin: 0;
   padding: 0;
 }
@@ -66,8 +85,6 @@ nav ul {
   display: flex;
   flex-direction: row;
   gap: 16px;
-  margin: 0;
-  padding: 0;
 }
 nav ul li a {
   color: white;
@@ -104,6 +121,31 @@ td {
   outline: 1px solid #27272c;
 }
 
+.not-found {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.nav-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;        
+  justify-content: space-between;
+  padding: 1rem 2rem;
+}
+
+.cart-search-con {
+  display: flex;
+  flex-direction: row;
+  align-items: center;        
+  justify-content: space-between;
+  padding: 1rem 2rem;
+}
+
 .logo {
   font-size: 2rem;
   font-weight: bold;
@@ -117,6 +159,7 @@ td {
   gap: 1rem;
   grid-template-areas:"search-container cart-details" ;
 }
+
 .search-bar{
   margin-left: 10px;
   background-color: white;

@@ -93,12 +93,6 @@ async function getCart() {
   return (
     <div>
       <div className='cart-search-grid'>
-        <section className='cart-details' style={{gridArea: 'cart-details'}} aria-label='Cart Summary'>
-            <h1>Your Cart</h1>
-            <h2>Total Items: {cartCount}</h2>
-            <h2>Total Cost: ${cartTotal.toFixed(2)}</h2>
-        </section>
-
         <section className='search-container' style={{gridArea: 'search-container'}} aria-label='Product Search'>
           <h1>Search Here</h1>
           <label htmlFor='search-bar'>Search: Name or Category</label>
@@ -111,6 +105,12 @@ async function getCart() {
             value={searchTerm}
             onChange={e => setSearch(e.target.value)}
           />
+        </section>
+
+        <section className='cart-details' style={{gridArea: 'cart-details'}} aria-label='Cart Summary'>
+            <h1>Your Cart</h1>
+            <h2>Total Items: {cartCount}</h2>
+            <h2>Total Cost: ${cartTotal.toFixed(2)}</h2>
         </section>
       </div>
 
