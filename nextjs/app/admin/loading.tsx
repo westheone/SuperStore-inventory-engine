@@ -8,9 +8,9 @@ return (
       <div className='admin-container'>
   
         <section className='admin-form-container' aria-label='Admin Forms'>
-          <AddFrom/>
-          <UpdateFrom/>
-          <DeleteForm/>
+          <form><h2>Add New Product</h2><h2>...Loading...</h2></form>
+          <form><h2>Update Product</h2><h2>...Loading...</h2></form>
+          <form><h2>Delete Product</h2><h2>...Loading...</h2></form>
         </section>
   
         <section className='admin-lowstock-container' aria-label='Low Stock Products'>
