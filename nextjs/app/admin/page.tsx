@@ -18,6 +18,66 @@ export default function AdminPage() {
     setInventory(data.inventory)
   }
 
+  async function addProduct(formData: FormData) {
+  const product = {
+    name: formData.get("name"),
+    category: formData.get("category"),
+    price: Number(formData.get("price")),
+    stockCount: Number(formData.get("stock")),
+  }
+
+  try{
+      await fetch('./api/inventory', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(product)
+      })
+      
+    } catch (error) {
+      console.error("Failed to add product", error)
+      alert("Product failed to add")
+    }
+
+  }
+
+  async function updateProduct(formData: FormData) {
+
+  const product = {
+    id: Number(formData.get("id")),
+    price: Number(formData.get("price")),
+    stockCount: Number(formData.get("stock")),
+  }
+
+  try {
+      const res = await fetch(`./api/inventory/${product.id}`, {
+        method: 'PATCH',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({price: product.price, stockCount: product.stockCount})
+      })
+      if (!res.ok) {
+         const err = await res.json().catch(() => ({}))
+        throw new Error(err.message ?? `Server responded with status: ${res.status}`)
+        }
+
+    } catch (error) {
+      console.error("Failed to update product", error)
+    }
+  }
+
+  async function deleteProduct(formData: FormData) {
+  const product = {
+    id: Number(formData.get("id"))
+  }
+
+  try {
+    await fetch(`./api/inventory/${product.id}`, {
+      method: 'DELETE',
+      headers: {'Content-Type':'application/json'}
+     })
+  } catch (error) {
+    console.error("Failed to delete product", error)
+  }
+  }
 
   useEffect(() => {
     getInventory()
@@ -29,9 +89,9 @@ export default function AdminPage() {
     <div className='admin-container'>
 
       <section className='admin-form-container' aria-label='Admin Forms'>
-        <AddFrom/>
-        <UpdateFrom/>
-        <DeleteForm/>
+        <AddFrom onAdd={addProduct}/>
+        <UpdateFrom onUpdate={updateProduct}/>
+        <DeleteForm onDelete={deleteProduct}/>
       </section>
 
       <section className='admin-lowstock-container' aria-label='Low Stock Products'>

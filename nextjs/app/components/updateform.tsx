@@ -1,31 +1,12 @@
 
-async function onUpdateProduct(formData: FormData) {
-  const product = {
-    id: Number(formData.get("id")),
-    price: Number(formData.get("price")),
-    stockCount: Number(formData.get("stock")),
-  }
-
-  try {
-      const res = await fetch(`./api/inventory/${product.id}`, {
-        method: 'PATCH',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify(product)
-      })
-      if (!res.ok) {
-         const err = await res.json().catch(() => ({}))
-        throw new Error(err.message ?? `Server responded with status: ${res.status}`)
-        }
-
-    } catch (error) {
-      console.error("Failed to update product", error)
-    }
+type Prop = {
+  onUpdate: (formdata:FormData) => void
 }
 
-export default function UpdateFrom() {
+export default function UpdateFrom({onUpdate}:Prop ) {
 
   return(
-    <form id="update-product-form" action={onUpdateProduct} className="inventory-form" aria-label="Update Product">
+    <form id="update-product-form" action={onUpdate} className="inventory-form" aria-label="Update Product">
       <h2>Update Product</h2>
         <label htmlFor="product-id">Product Id:</label>
         <input 

@@ -1,32 +1,12 @@
 
-async function onAddProduct(formData: FormData) {
-  const product = {
-    name: formData.get("name"),
-    category: formData.get("category"),
-    price: Number(formData.get("price")),
-    stockCount: Number(formData.get("stock")),
-  }
-
-  try{
-      await fetch('./api/inventory', {
-        method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify(product)
-      })
-      
-    } catch (error) {
-      console.error("Failed to add product", error)
-      alert("Product failed to add")
-    }
-
+type Prop = {
+  onAdd: (formData: FormData) => void
 }
 
-
-
-export default function AddFrom() {
+export default function AddFrom({onAdd}:Prop) {
 
   return(
-    <form id="add-product-form" action={onAddProduct} className="inventory-form" aria-label="Add New Product">
+    <form id="add-product-form" action={onAdd} className="inventory-form" aria-label="Add New Product">
       <h2>Add New Product</h2>
         <label htmlFor="product-name">Product Name:</label>
         <input
