@@ -9,18 +9,18 @@ const navlinks = [
 export default function NavLinks () {
 
   return(
-    <section>
-     <h1>Super Store</h1> 
+    <section className="nav-container" >
+     <div><h1>Super Store</h1></div>
 
-    <nav>
-      <ul>
-        {navlinks.map((link) => (
-        <li key={link.href}>
-          <Link href={link.href} ><p>{link.name}</p></Link>
-        </li>
-      ))}
-      </ul>
-    </nav>
+        <nav>
+          <ul>
+            {navlinks.map((link) => (
+            <li key={link.href}>
+              <Link href={link.href} ><h2>{link.name}</h2></Link>
+            </li>
+          ))}
+          </ul>
+        </nav> 
     </section>
   )
 }

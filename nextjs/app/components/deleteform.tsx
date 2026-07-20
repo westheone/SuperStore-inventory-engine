@@ -1,22 +1,12 @@
-async function onDeleteProduct(formData: FormData) {
-  const product = {
-    id: Number(formData.get("id"))
-  }
 
-  try {
-    await fetch(`./api/inventory/${product.id}`, {
-      method: 'DELETE',
-      headers: {'Content-Type':'application/json'}
-     })
-  } catch (error) {
-    console.error("Failed to delete product", error)
-  }
+type Prop = {
+  onDelete: (formData: FormData) => void
 }
 
-export default function DeleteForm() {
+export default function DeleteForm({onDelete}: Prop) {
 
   return(
-    <form id="delete-product-form" action={onDeleteProduct} className="inventory-form" aria-label="Delete Product"> 
+    <form id="delete-product-form" action={onDelete} className="inventory-form" aria-label="Delete Product"> 
        <h2>Delete Product</h2>
         <label htmlFor="product-id">Product Id:</label>
         <input 

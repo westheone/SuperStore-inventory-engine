@@ -3,9 +3,9 @@ import { NextResponse } from 'next/server';
 
 export async function PATCH(
   req: Request,
-  { params }: { params: Promise<{ cartid: number }> }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const cartid = (await params).cartid
+  const cartid = parseInt((await params).id)
   const productid = await req.json()
 
   try {
@@ -31,9 +31,9 @@ export async function PATCH(
 
 export async function DELETE(
   req: Request,
-  { params }: { params: Promise<{ cartid: number }> }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const cartid = (await params).cartid
+  const cartid = parseInt((await params).id)
 
   try {
     const item = await prisma.cartItem.findUnique({ where: { cartid: cartid } })
